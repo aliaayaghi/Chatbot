@@ -2,7 +2,7 @@
 
 A full-stack AI chat application built with Next.js and the Google Gemini API. Features a persistent chat history sidebar, multi-turn conversations, and a clean minimal UI.
 
-[![Visit Live Demo](https://img.shields.io/badge/LIVE_DEMO-Visit_Site-blue?style=for-the-badge&logo=vercel)](ary-ai-chatbot.vercel.app)
+[![Visit Live Demo](https://img.shields.io/badge/LIVE_DEMO-Visit_Site-blue?style=for-the-badge&logo=vercel)](https://ary-ai-chatbot.vercel.app)
 
 ![Next.js](https://img.shields.io/badge/Next.js-15-black?style=flat-square)
 ![Google Gemini](https://img.shields.io/badge/Gemini-2.5_Flash-blue?style=flat-square)
