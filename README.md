@@ -33,7 +33,7 @@ A full-stack AI chat application built with Next.js and the Google Gemini API. F
 
 ---
 
-## Screenshot
+## UI Demo
 
 ![Gemini Chat UI](./assets/screenshot.png)
 
