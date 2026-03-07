@@ -35,7 +35,7 @@ A full-stack AI chat application built with Next.js and the Google Gemini API. F
 
 ## Screenshot
 
-![Gemini Chat UI](https://github.com/user-attachments/assets/b2fce56f-562c-4b92-a54a-397c86d1c0fe)
+![Gemini Chat UI](./assets/screenshot.png)
 
 ---
 
@@ -55,6 +55,8 @@ A full-stack AI chat application built with Next.js and the Google Gemini API. F
 
 - Node.js 18+ installed
 - A Google Gemini API key — get one free at [aistudio.google.com](https://aistudio.google.com)
+
+
 
 ### Installation
 
