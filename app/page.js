@@ -11,6 +11,7 @@ export default function Home() {
   const bottomRef = useRef(null);
   const [chats, setChats] = useState([]);
   const [activeChatId, setActiveChatId] = useState(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   function handleNewChat() {
   setMessages([]);
@@ -139,10 +140,50 @@ localStorage.setItem("gemini_chats", JSON.stringify(updatedChats));
   }
 
   return (
-    <main style={styles.page}>
+   <main style={styles.page}>
+  <style>{`
+  @media (max-width: 768px) {
+    .sidebar {
+      position: fixed !important;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      z-index: 100;
+      transition: transform 0.3s ease;
+      transform: translateX(-100%);
+    }
+    .sidebar.open {
+      transform: translateX(0) !important;
+    }
+    .toggle-btn {
+      display: flex !important;
+    }
+    .overlay {
+      display: block !important;
+    }
+  }
+`}</style>
+
   <div style={styles.layout}>
 
-    <div style={styles.sidebar}>
+    {sidebarOpen && (
+      <div
+        className="overlay"
+        onClick={() => setSidebarOpen(false)}
+        style={{
+          display: "none",
+          position: "fixed",
+          inset: 0,
+          backgroundColor: "rgba(0,0,0,0.3)",
+          zIndex: 99,
+        }}
+      />
+    )}
+
+   <div
+  className={sidebarOpen ? "sidebar open" : "sidebar"}
+  style={styles.sidebar}
+>
 
   <div style={styles.sidebarHeader}>
     <span style={styles.sidebarTitle}>Chats</span>
@@ -187,9 +228,27 @@ localStorage.setItem("gemini_chats", JSON.stringify(updatedChats));
 
         {/* Header */}
         <div style={styles.header}>
-          <div style={styles.headerDot} />
-          <span style={styles.headerTitle}>Chat Now</span>
-        </div>
+  <button
+    className="toggle-btn"
+    onClick={() => setSidebarOpen(!sidebarOpen)}
+    style={{
+      display: "none",
+      alignItems: "center",
+      justifyContent: "center",
+      background: "none",
+      border: "1px solid #ddd",
+      borderRadius: "8px",
+      padding: "4px 8px",
+      fontSize: "16px",
+      cursor: "pointer",
+      color: "#555",
+    }}
+  >
+    ☰
+  </button>
+  <div style={styles.headerDot} />
+  <span style={styles.headerTitle}>Chat Now</span>
+</div>
 
         {/* Messages area */}
         <div style={styles.messages}>
