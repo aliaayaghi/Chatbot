@@ -1,10 +1,11 @@
 "use client";
 
+import { Suspense } from "react";
 import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { setToken } from "../../../lib/auth";
 
-export default function AuthCallback() {
+function CallbackHandler() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -23,5 +24,13 @@ export default function AuthCallback() {
       justifyContent: "center", fontFamily: "'Georgia', serif" }}>
       <p style={{ color: "#aaa" }}>Signing you in...</p>
     </main>
+  );
+}
+
+export default function AuthCallback() {
+  return (
+    <Suspense fallback={<p style={{ color: "#aaa" }}>Loading...</p>}>
+      <CallbackHandler />
+    </Suspense>
   );
 }
