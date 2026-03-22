@@ -1,6 +1,9 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { getChats, createChat, updateChat, deleteChat } from "../lib/api";
+import { useRouter } from "next/navigation";
+import { isLoggedIn, removeToken } from "../lib/auth";
 
 
 export default function Home() {
@@ -12,6 +15,8 @@ export default function Home() {
   const [chats, setChats] = useState([]);
   const [activeChatId, setActiveChatId] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
+  const router = useRouter();
 
   function handleNewChat() {
   setMessages([]);
@@ -20,18 +25,30 @@ export default function Home() {
   setActiveChatId(null);
 }
 
+useEffect(() => {
+  if (!isLoggedIn()) {
+    router.push("/login");
+  } else {
+    setAuthChecked(true); // ← only show the page after confirming logged in
+  }
+}, []);
+
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   // Runs once when the page loads — reads saved chats from localStorage
 useEffect(() => {
-  try {
-    const saved = localStorage.getItem("gemini_chats");
-    if (saved) setChats(JSON.parse(saved));
-  } catch {
-    setChats([]);
+  async function loadChats() {
+    try {
+      const chats = await getChats();
+      setChats(chats);
+    } catch (error) {
+      console.log("Could not load chats:", error.message);
+      setChats([]);
+    }
   }
+  loadChats();
 }, []);
 
 // Shortens long text so it fits as a chat title
@@ -59,13 +76,16 @@ function handleLoadChat(chat) {
   setMessage("");
 }
 
-// Deletes a chat from the list and localStorage
-function handleDeleteChat(e, chatId) {
+async function handleDeleteChat(e, chatId) {
   e.stopPropagation();
-  const updated = chats.filter((c) => c.id !== chatId);
-  setChats(updated);
-  localStorage.setItem("gemini_chats", JSON.stringify(updated));
-  if (activeChatId === chatId) handleNewChat();
+  try {
+    await deleteChat(chatId);
+    const updated = chats.filter((c) => c.id !== chatId);
+    setChats(updated);
+    if (activeChatId === chatId) handleNewChat();
+  } catch (error) {
+    console.log("Could not delete chat:", error.message);
+  }
 }
 
   async function handleSend() {
@@ -116,12 +136,19 @@ const updatedChat = {
   ],
 };
 
-const updatedChats = activeChatId
-  ? chats.map((c) => (c.id === chatId ? updatedChat : c))
-  : [updatedChat, ...chats];
-
-setChats(updatedChats);
-localStorage.setItem("gemini_chats", JSON.stringify(updatedChats));
+if (activeChatId) {
+  // Existing chat — update it
+  await updateChat(chatId, {
+    messages: updatedChat.messages,
+    history: updatedChat.history,
+    timestamp: updatedChat.timestamp,
+  });
+  setChats(chats.map((c) => (c.id === chatId ? updatedChat : c)));
+} else {
+  // New chat — create it
+  await createChat(updatedChat);
+  setChats([updatedChat, ...chats]);
+}
 
 
       setMessages((prev) => [...prev, { role: "ai", text: data.reply }]);
@@ -139,6 +166,7 @@ localStorage.setItem("gemini_chats", JSON.stringify(updatedChats));
     }
   }
 
+  if (!authChecked) return null; 
   return (
    <main style={styles.page}>
   <style>{`
@@ -246,6 +274,12 @@ localStorage.setItem("gemini_chats", JSON.stringify(updatedChats));
   >
     ☰
   </button>
+  <button
+  onClick={() => { removeToken(); router.push("/login"); }}
+  style={styles.logoutBtn}
+>
+  Logout
+</button>
   <div style={styles.headerDot} />
   <span style={styles.headerTitle}>Chat Now</span>
 </div>
@@ -327,6 +361,17 @@ const styles = {
     gap: "10px",
     backgroundColor: "#fafaf8",
   },
+  logoutBtn: {
+  marginLeft: "auto",
+  padding: "6px 14px",
+  backgroundColor: "transparent",
+  color: "#cc0000",
+  border: "1px solid #cc0000",
+  borderRadius: "8px",
+  fontSize: "13px",
+  cursor: "pointer",
+  fontFamily: "inherit",
+},
   headerDot: {
     width: "10px",
     height: "10px",
