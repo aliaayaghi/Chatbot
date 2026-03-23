@@ -152,9 +152,12 @@ if (activeChatId) {
 
 
       setMessages((prev) => [...prev, { role: "ai", text: data.reply }]);
-    } catch (error) {
-      setMessages((prev) => [...prev, { role: "ai", text: "Something went wrong." }]);
-    } finally {
+   } catch (error) {
+  console.log("FULL ERROR:", error);
+  console.log("ERROR MESSAGE:", error.message);
+  console.log("ERROR STACK:", error.stack);
+  setMessages((prev) => [...prev, { role: "ai", text: error.message }]);
+} finally {
       setLoading(false);
     }
   }
